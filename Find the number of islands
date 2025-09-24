@@ -1,0 +1,64 @@
+Given a grid of size n*m (n is the number of rows and m is the number of columns in the grid) consisting of 'W's (Water) and 'L's (Land). Find the number of islands.
+
+Note: An island is either surrounded by water or the boundary of a grid and is formed by connecting adjacent lands horizontally or vertically or diagonally i.e., in all 8 directions.
+
+Examples:
+
+Input: grid[][] = [['L', 'L', 'W', 'W', 'W'], ['W', 'L', 'W', 'W', 'L'], ['L', 'W', 'W', 'L', 'L'], ['W', 'W', 'W', 'W', 'W'], ['L', 'W', 'L', 'L', 'W']]
+Output: 4
+Explanation:
+The image below shows all the 4 islands in the grid.
+ 
+Input: grid[][] = [['W', 'L', 'L', 'L', 'W', 'W', 'W'], ['W', 'W', 'L', 'L', 'W', 'L', 'W']]
+Output: 2
+Expanation:
+The image below shows 2 islands in the grid.
+ 
+Constraints:
+1 ≤ n, m ≤ 500
+grid[i][j] = {'L', 'W'}
+
+
+
+
+class Solution {
+    public int countIslands(char[][] grid) {
+        if (grid == null || grid.length == 0 || grid[0].length == 0) return 0;
+        int n = grid.length;
+        int m = grid[0].length;
+        boolean[][] vis = new boolean[n][m];
+        int islands = 0;
+
+        int[] dr = {-1,-1,-1,0,0,1,1,1};
+        int[] dc = {-1,0,1,-1,1,-1,0,1};
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (grid[i][j] == 'L' && !vis[i][j]) {
+                    islands++;
+                    // iterative DFS to avoid stack overflow on large grids
+                    java.util.ArrayDeque<int[]> stack = new java.util.ArrayDeque<>();
+                    stack.push(new int[]{i, j});
+                    vis[i][j] = true;
+
+                    while (!stack.isEmpty()) {
+                        int[] cur = stack.pop();
+                        int r = cur[0], c = cur[1];
+                        for (int k = 0; k < 8; k++) {
+                            int nr = r + dr[k];
+                            int nc = c + dc[k];
+                            if (nr >= 0 && nr < n && nc >= 0 && nc < m) {
+                                if (grid[nr][nc] == 'L' && !vis[nr][nc]) {
+                                    vis[nr][nc] = true;
+                                    stack.push(new int[]{nr, nc});
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return islands;
+    }
+}
