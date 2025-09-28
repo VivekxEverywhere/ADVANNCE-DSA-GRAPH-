@@ -1,0 +1,59 @@
+Given a square grid of size N, each cell of which contains an integer cost that represents a cost to traverse through that cell, we need to find a path from the top left cell to the bottom right cell by which the total cost incurred is minimum.
+From the cell (i,j) we can go (i,j-1), (i, j+1), (i-1, j), (i+1, j).  
+
+Examples :
+
+Input: grid = [[9,4,9,9],
+               [6,7,6,4],
+               [8,3,3,7],
+               [7,4,9,10]]
+Output: 43
+Explanation: The minimum cost is-
+9 + 4 + 7 + 3 + 3 + 7 + 10 = 43.
+Input: grid = [[4,4],
+               [3,7]]
+Output: 14
+Explanation: The minimum cost is- 4 + 3 + 7 = 14.
+Constraints:
+1 ≤ n ≤ 500
+1 ≤ cost of cells ≤ 500
+
+
+
+
+class Solution {
+    public int minimumCostPath(int[][] grid) {
+        if (grid == null || grid.length == 0 || grid[0].length == 0) return 0;
+        int n = grid.length, m = grid[0].length;
+        int[][] dist = new int[n][m];
+        for (int[] row : dist) Arrays.fill(row, Integer.MAX_VALUE);
+        PriorityQueue<Cell> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a.cost));
+        dist[0][0] = grid[0][0];
+        pq.add(new Cell(0, 0, dist[0][0]));
+        int[] dr = {-1, 1, 0, 0};
+        int[] dc = {0, 0, -1, 1};
+
+        while (!pq.isEmpty()) {
+            Cell cur = pq.poll();
+            int r = cur.r, c = cur.c, cost = cur.cost;
+            if (r == n - 1 && c == m - 1) return cost;
+            if (cost != dist[r][c]) continue;
+            for (int k = 0; k < 4; k++) {
+                int nr = r + dr[k], nc = c + dc[k];
+                if (nr >= 0 && nr < n && nc >= 0 && nc < m) {
+                    int ncost = cost + grid[nr][nc];
+                    if (ncost < dist[nr][nc]) {
+                        dist[nr][nc] = ncost;
+                        pq.add(new Cell(nr, nc, ncost));
+                    }
+                }
+            }
+        }
+        return dist[n - 1][m - 1];
+    }
+
+    static class Cell {
+        int r, c, cost;
+        Cell(int r, int c, int cost) { this.r = r; this.c = c; this.cost = cost; }
+    }
+}
