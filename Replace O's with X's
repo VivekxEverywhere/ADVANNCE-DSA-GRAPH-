@@ -1,0 +1,91 @@
+Given a matrix mat where every element is either 'O' or 'X'. Replace all 'O' or a group of 'O' with 'X' that are surrounded by 'X'.
+
+A 'O' (or a set of 'O') is considered to be surrounded by 'X' if there are 'X' at locations just below, just above, just left and just right of it.
+
+Examples:
+
+Input: mat = 
+[['X', 'X', 'X', 'X'], 
+['X', 'O', 'X', 'X'], 
+['X', 'O', 'O', 'X'], 
+['X', 'O', 'X', 'X'], 
+['X', 'X', 'O', 'O']]
+Output: 
+[['X', 'X', 'X', 'X'], 
+['X', 'X', 'X', 'X'], 
+['X', 'X', 'X', 'X'], 
+['X', 'X', 'X', 'X'], 
+['X', 'X', 'O', 'O']]
+Explanation: We only changed those 'O' that are surrounded by 'X'
+Input: mat = 
+[['X', 'O', 'X', 'X'], 
+['X', 'O', 'X', 'X'], 
+['X', 'O', 'O', 'X'], 
+['X', 'O', 'X', 'X'], 
+['X', 'X', 'O', 'O']]
+Output: 
+[['X', 'O', 'X', 'X'], 
+['X', 'O', 'X', 'X'], 
+['X', 'O', 'O', 'X'], 
+['X', 'O', 'X', 'X'], 
+['X', 'X', 'O', 'O']]
+Explanation: There's no 'O' that's surround by 'X'.
+Input: mat = 
+[['X', 'X', 'X'], 
+['X', 'O', 'X'], 
+['X', 'X', 'X']]
+Output: 
+[['X', 'X', 'X'], 
+['X', 'X', 'X'], 
+['X', 'X', 'X']]
+Explanation: There's only one 'O' that's surround by 'X'.
+Constraints:
+1 ≤ mat.size() ≤ 100
+1 ≤ mat[0].size() ≤ 100
+
+
+
+
+
+// User function Template for Java
+
+class Solution {
+    static char[][] fill(char[][] mat) {
+        if (mat == null || mat.length == 0 || mat[0].length == 0) return mat;
+        int n = mat.length, m = mat[0].length;
+        boolean[][] vis = new boolean[n][m];
+        int[] dr = {-1, 1, 0, 0};
+        int[] dc = {0, 0, -1, 1};
+
+        // Mark O's connected to border as non-surrounded
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if ((i == 0 || i == n - 1 || j == 0 || j == m - 1) && mat[i][j] == 'O' && !vis[i][j]) {
+                    java.util.ArrayDeque<int[]> q = new java.util.ArrayDeque<>();
+                    q.add(new int[]{i, j});
+                    vis[i][j] = true;
+                    while (!q.isEmpty()) {
+                        int[] cur = q.poll();
+                        int r = cur[0], c = cur[1];
+                        for (int k = 0; k < 4; k++) {
+                            int nr = r + dr[k], nc = c + dc[k];
+                            if (nr >= 0 && nr < n && nc >= 0 && nc < m && !vis[nr][nc] && mat[nr][nc] == 'O') {
+                                vis[nr][nc] = true;
+                                q.add(new int[]{nr, nc});
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (mat[i][j] == 'O' && !vis[i][j]) {
+                    mat[i][j] = 'X';
+                }
+            }
+        }
+
+        return mat;
+    }
+}
