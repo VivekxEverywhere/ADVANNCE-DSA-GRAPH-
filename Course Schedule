@@ -1,0 +1,71 @@
+There are a total of numCourses courses you have to take, labeled from 0 to numCourses - 1. You are given an array prerequisites where prerequisites[i] = [ai, bi] indicates that you must take course bi first if you want to take course ai.
+
+For example, the pair [0, 1], indicates that to take course 0 you have to first take course 1.
+Return true if you can finish all courses. Otherwise, return false.
+
+ 
+
+Example 1:
+
+Input: numCourses = 2, prerequisites = [[1,0]]
+Output: true
+Explanation: There are a total of 2 courses to take. 
+To take course 1 you should have finished course 0. So it is possible.
+Example 2:
+
+Input: numCourses = 2, prerequisites = [[1,0],[0,1]]
+Output: false
+Explanation: There are a total of 2 courses to take. 
+To take course 1 you should have finished course 0, and to take course 0 you should also have finished course 1. So it is impossible.
+ 
+
+Constraints:
+
+1 <= numCourses <= 2000
+0 <= prerequisites.length <= 5000
+prerequisites[i].length == 2
+0 <= ai, bi < numCourses
+All the pairs prerequisites[i] are unique.
+
+
+
+
+
+
+class Solution {
+    public boolean canFinish(int numCourses, int[][] prerequisites) {
+        Map<Integer, List<Integer>> preMap = new HashMap<>();
+        for (int i = 0; i < numCourses; i++) {
+            preMap.put(i, new ArrayList<>());
+        }
+
+        for (int[] pair : prerequisites) {
+            preMap.get(pair[0]).add(pair[1]);
+        }
+
+        Set<Integer> visiting = new HashSet<>();
+        Set<Integer> visited = new HashSet<>();
+
+        for (int course = 0; course < numCourses; course++) {
+            if (!dfs(course, preMap, visiting, visited)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    private boolean dfs(int course, Map<Integer, List<Integer>> preMap,
+                        Set<Integer> visiting, Set<Integer> visited) {
+        if (visiting.contains(course)) return false; 
+        if (visited.contains(course)) return true;   
+
+        visiting.add(course);
+        for (int prereq : preMap.get(course)) {
+            if (!dfs(prereq, preMap, visiting, visited)) {
+                return false;
+            }
+        }   
+        visiting.remove(course); 
+        visited.add(course); 
+        return true;
+    }
+}
