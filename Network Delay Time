@@ -1,0 +1,97 @@
+You are given a network of n nodes, labeled from 1 to n. You are also given times, a list of travel times as directed edges times[i] = (ui, vi, wi), where ui is the source node, vi is the target node, and wi is the time it takes for a signal to travel from source to target.
+
+We will send a signal from a given node k. Return the minimum time it takes for all the n nodes to receive the signal. If it is impossible for all the n nodes to receive the signal, return -1.
+
+ 
+
+Example 1:
+
+
+Input: times = [[2,1,1],[2,3,1],[3,4,1]], n = 4, k = 2
+Output: 2
+Example 2:
+
+Input: times = [[1,2,1]], n = 2, k = 1
+Output: 1
+Example 3:
+
+Input: times = [[1,2,1]], n = 2, k = 2
+Output: -1
+ 
+
+Constraints:
+
+1 <= k <= n <= 100
+1 <= times.length <= 6000
+times[i].length == 3
+1 <= ui, vi <= n
+ui != vi
+0 <= wi <= 100
+All the pairs (ui, vi) are unique. (i.e., no multiple edges.)
+
+
+
+
+
+class Solution {
+    int[] d = new int[101];
+    boolean[] vis = new boolean[101];
+
+    void init(int n, int k, int[][] times) {
+        for (int i = 1; i <= n; i++) {
+            d[i] = Integer.MAX_VALUE;
+            vis[i] = false;
+        }
+        d[k] = 0;
+        vis[k] = true;
+
+        for (int[] edge : times) {
+            if (edge[0] == k) {
+                d[edge[1]] = edge[2];
+            }
+        }
+    }
+
+    int minDist(int n) {
+        int min = Integer.MAX_VALUE;
+        int minIdx = -1;
+
+        for (int i = 1; i <= n; i++) {
+            if (!vis[i] && d[i] < min) {
+                min = d[i];
+                minIdx = i;
+            }
+        }
+        return minIdx;
+    }
+
+    void relaxation(int u, int n, int[][] times) {
+        for (int[] edge : times) {
+            int from = edge[0];
+            int to = edge[1];
+            int wt = edge[2];
+
+            if (from == u && !vis[to] && d[u] + wt < d[to]) {
+                d[to] = d[u] + wt;
+            }
+        }
+    }
+
+    public int networkDelayTime(int[][] times, int n, int k) {
+        init(n , k , times);
+
+        for (int cnt = 1; cnt <= n; cnt++) {
+            int u = minDist(n);
+            if (u == -1) break;
+            vis[u] = true;
+            relaxation(u , n , times);
+        }
+
+        int maxTime = 0;
+        for (int i = 1; i <= n; i++) {
+            if (d[i] == Integer.MAX_VALUE) return -1;
+            maxTime = Math.max(maxTime , d[i]);
+        }
+        return maxTime;
+    }
+}
